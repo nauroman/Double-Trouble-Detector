@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Double Trouble Detector</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        html {
+            font-size: 1vw; /* 1vw = 1% of the viewport width */
+            margin: 0;
+            user-select: none;
+        }
+
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Roboto Condensed', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            }
+        .container {
+            text-align: center;
+            padding: 4rem; /* Adjusted for responsiveness */
+            background-color: #1e1e1e;
+            border-radius: 1rem; /* Adjusted for responsiveness */
+            box-shadow: 0px 0px 1rem rgba(0, 0, 0, 0.5); /* Adjusted for responsiveness */
+            width: 70vw;
+            user-select: none;
+        }
+
+        h1 {
+            margin-bottom: 2rem; /* Adjusted for responsiveness */
+            user-select: none;
+        }
+
+        .description {
+            margin-bottom: 3rem; /* Adjusted for responsiveness */
+            user-select: none;
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        .large-text {
+            font-size: 1.5rem; /* Adjusted for responsiveness */
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        .counter {
+            margin: 1.5rem 0;
+            padding: 1rem;
+            border-radius: 0.5rem; /* Adjusted for responsiveness */
+            user-select: none;
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        #doubleClickPercentage {
+            padding: 1rem;
+            border-radius: 0.5rem; /* Adjusted for responsiveness */
+            user-select: none;
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        #resetButton {
+            margin-top: 2rem; /* Adjusted for responsiveness */
+            padding: 1rem 2rem; /* Adjusted for responsiveness */
+            border: none;
+            border-radius: 0.5rem; /* Adjusted for responsiveness */
+            background-color: #808080;
+            color: #ffffff;
+            font-weight: bold;
+            font-size: 1rem; /* Adjusted for responsiveness */
+            font-family: 'Roboto Condensed', sans-serif;
+        }
+
+        #resetButton:hover {
+            background-color: #6e6e6e;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Double Trouble Detector</h1>
+        <p class="description">Click your mouse button and let us detect if your mouse is malfunctioning. Rattling
+            occurs when a broken mouse button sends unintended extra clicks, leading to double clicks when you only
+            meant to click once. Too many double clicks? It might be time for a new mouse!</p>
+        <div id="clickCounter" class="counter">Clicks: 0</div>
+        <div id="doubleClickCounter" class="counter">Double Clicks: 0</div>
+        <div id="doubleClickPercentage" class="counter">Double Click Percentage: 0%</div>
+        <div id="lastDoubleClickTime" class="counter" style="display: none;">Last Double Click Duration: N/A</div>
+        <button id="resetButton">Reset</button>
+    </div>
+    <script>
+        const translations = {
+            en: {
+                title: "Double Trouble Detector",
+                description: "Click your mouse button and let us detect if your mouse is malfunctioning. Rattling occurs when a broken mouse button sends unintended extra clicks, leading to double clicks when you only meant to click once. Too many double clicks? It might be time for a new mouse!",
+                clicks: "Clicks: ",
+                doubleClicks: "Double Clicks: ",
+                doubleClickPercentage: "Double Click Percentage: ",
+                lastDoubleClickDuration: "Last Double Click Duration: ",
+                resetButton: "Reset"
+            },
+            es: {
+                title: "Detector de Problemas Dobles",
+                description: "Haz clic en el botón del ratón y déjanos detectar si tu ratón está fallando. El traqueteo ocurre cuando un botón roto del ratón envía clics adicionales no deseados, lo que lleva a clics dobles cuando solo querías hacer clic una vez. ¿Demasiados clics dobles? ¡Podría ser hora de un ratón nuevo!",
+                clicks: "Clics: ",
+                doubleClicks: "Doble Clics: ",
+                doubleClickPercentage: "Porcentaje de Doble Clic: ",
+                lastDoubleClickDuration: "Duración del Último Doble Clic: ",
+                resetButton: "Reiniciar"
+            },
+            zh: {
+                title: "双重麻烦检测器",
+                description: "点击鼠标按钮，让我们检测您的鼠标是否出现故障。当损坏的鼠标按钮发送意外的额外点击时，会发生咔嗒声，导致您只想点击一次时出现双击。双击太多？可能是时候换一个新鼠标了！",
+                clicks: "点击: ",
+                doubleClicks: "双击: ",
+                doubleClickPercentage: "双击百分比: ",
+                lastDoubleClickDuration: "上次双击持续时间: ",
+                resetButton: "重置"
+            },
+            hi: {
+                title: "डबल ट्रबल डिटेक्टर",
+                description: "अपने माउस बटन पर क्लिक करें और हमें यह पता लगाने दें कि आपका माउस खराब हो रहा है या नहीं। जब टूटा हुआ माउस बटन अनपेक्षित अतिरिक्त क्लिक भेजता है, तो खड़खड़ाहट होती है, जिससे आप केवल एक बार क्लिक करना चाहते थे, लेकिन डबल क्लिक हो जाता है। बहुत अधिक डबल क्लिक? शायद नए माउस का समय आ गया है!",
+                clicks: "क्लिक: ",
+                doubleClicks: "डबल क्लिक: ",
+                doubleClickPercentage: "डबल क्लिक प्रतिशत: ",
+                lastDoubleClickDuration: "अंतिम डबल क्लिक अवधि: ",
+                resetButton: "रीसेट"
+            },
+            ar: {
+                title: "كاشف المشاكل المزدوجة",
+                description: "انقر على زر الماوس ودعنا نكتشف ما إذا كان الماوس الخاص بك معطلاً. يحدث الاهتزاز عندما يرسل زر الماوس المكسور نقرات إضافية غير مقصودة، مما يؤدي إلى نقرات مزدوجة عندما كنت تقصد النقر مرة واحدة فقط. الكثير من النقرات المزدوجة؟ قد يكون الوقت قد حان لفأرة جديدة!",
+                clicks: "نقرات: ",
+                doubleClicks: "نقرات مزدوجة: ",
+                doubleClickPercentage: "نسبة النقرات المزدوجة: ",
+                lastDoubleClickDuration: "مدة آخر نقرة مزدوجة: ",
+                resetButton: "إعادة تعيين"
+            },
+            fr: {
+                title: "Détecteur de Double Problème",
+                description: "Cliquez sur le bouton de votre souris et laissez-nous détecter si votre souris fonctionne mal. Le cliquetis se produit lorsqu'un bouton de souris cassé envoie des clics supplémentaires non désirés, entraînant des doubles clics lorsque vous ne vouliez cliquer qu'une seule fois. Trop de doubles clics ? Il est peut-être temps de changer de souris !",
+                clicks: "Clics: ",
+                doubleClicks: "Double Clics: ",
+                doubleClickPercentage: "Pourcentage de Double Clic: ",
+                lastDoubleClickDuration: "Durée du Dernier Double Clic: ",
+                resetButton: "Réinitialiser"
+            },
+            bn: {
+                title: "ডাবল ট্রাবল ডিটেক্টর",
+                description: "আপনার মাউস বোতামে ক্লিক করুন এবং আমাদের জানতে দিন যে আপনার মাউসটি ত্রুটিপূর্ণ কিনা। যখন একটি ভাঙা মাউস বোতাম অনিচ্ছাকৃত অতিরিক্ত ক্লিক পাঠায়, তখন ঝাঁকুনি ঘটে, যার ফলে আপনি কেবল একবার ক্লিক করতে চেয়েছিলেন তখন ডাবল ক্লিক হয়। খুব বেশি ডাবল ক্লিক? সম্ভবত একটি নতুন মাউসের সময় এসেছে!",
+                clicks: "ক্লিক: ",
+                doubleClicks: "ডাবল ক্লিক: ",
+                doubleClickPercentage: "ডাবল ক্লিক শতাংশ: ",
+                lastDoubleClickDuration: "শেষ ডাবল ক্লিকের সময়কাল: ",
+                resetButton: "রিসেট"
+            },
+            ru: {
+                title: "Детектор двойных проблем",
+                description: "Нажмите кнопку мыши, и мы определим, неисправна ли ваша мышь. Дребезжание происходит, когда сломанная кнопка мыши отправляет непреднамеренные дополнительные щелчки, что приводит к двойным щелчкам, когда вы хотели щелкнуть только один раз. Слишком много двойных щелчков? Возможно, пришло время для новой мыши!",
+                clicks: "Клики: ",
+                doubleClicks: "Двойные клики: ",
+                doubleClickPercentage: "Процент двойных кликов: ",
+                lastDoubleClickDuration: "Продолжительность последнего двойного клика: ",
+                resetButton: "Сброс"
+            },
+            pt: {
+                title: "Detector de Problemas Duplos",
+                description: "Clique no botão do mouse e deixe-nos detectar se o seu mouse está com defeito. O chocalho ocorre quando um botão do mouse quebrado envia cliques extras indesejados, levando a cliques duplos quando você só queria clicar uma vez. Muitos cliques duplos? Pode ser hora de um novo mouse!",
+                clicks: "Cliques: ",
+                doubleClicks: "Cliques Duplos: ",
+                doubleClickPercentage: "Porcentagem de Cliques Duplos: ",
+                lastDoubleClickDuration: "Duração do Último Clique Duplo: ",
+                resetButton: "Redefinir"
+            },
+            id: {
+                title: "Detektor Masalah Ganda",
+                description: "Klik tombol mouse Anda dan biarkan kami mendeteksi apakah mouse Anda rusak. Rattling terjadi ketika tombol mouse yang rusak mengirimkan klik tambahan yang tidak diinginkan, yang mengarah ke klik ganda ketika Anda hanya bermaksud mengklik sekali. Terlalu banyak klik ganda? Mungkin sudah waktunya untuk mouse baru!",
+                clicks: "Klik: ",
+                doubleClicks: "Klik Ganda: ",
+                doubleClickPercentage: "Persentase Klik Ganda: ",
+                lastDoubleClickDuration: "Durasi Klik Ganda Terakhir: ",
+                resetButton: "Atur Ulang"
+            },
+            ur: {
+                title: "ڈبل پریشانی کا پتہ لگانے والا",
+                description: "اپنے ماؤس کے بٹن پر کلک کریں اور ہمیں یہ پتہ لگانے دیں کہ آیا آپ کا ماؤس خراب ہو رہا ہے۔ جب ٹوٹا ہوا ماؤس بٹن غیر ارادی اضافی کلکس بھیجتا ہے تو کھڑکھڑاہٹ ہوتی ہے، جس کے نتیجے میں آپ صرف ایک بار کلک کرنا چاہتے تھے لیکن ڈبل کلک ہو جاتا ہے۔ بہت زیادہ ڈبل کلکس؟ شاید نئے ماؤس کا وقت آ گیا ہے!",
+                clicks: "کلکس: ",
+                doubleClicks: "ڈبل کلکس: ",
+                doubleClickPercentage: "ڈبل کلک فیصد: ",
+                lastDoubleClickDuration: "آخری ڈبل کلک کا دورانیہ: ",
+                resetButton: "ری سیٹ کریں"
+            },
+            de: {
+                title: "Doppelproblem-Detektor",
+                description: "Klicken Sie auf die Maustaste und lassen Sie uns feststellen, ob Ihre Maus defekt ist. Rasseln tritt auf, wenn eine defekte Maustaste unbeabsichtigte zusätzliche Klicks sendet, was zu Doppelklicks führt, wenn Sie nur einmal klicken wollten. Zu viele Doppelklicks? Es könnte Zeit für eine neue Maus sein!",
+                clicks: "Klicks: ",
+                doubleClicks: "Doppelklicks: ",
+                doubleClickPercentage: "Doppelklick-Prozentsatz: ",
+                lastDoubleClickDuration: "Dauer des letzten Doppelklicks: ",
+                resetButton: "Zurücksetzen"
+            },
+            ja: {
+                title: "ダブルトラブル検出器",
+                description: "マウスボタンをクリックして、マウスが故障しているかどうかを検出させてください。壊れたマウスボタンが意図しない追加のクリックを送信すると、ガタガタ音が発生し、1回クリックするつもりだったのにダブルクリックが発生します。ダブルクリックが多すぎますか？新しいマウスの時期かもしれません！",
+                clicks: "クリック: ",
+                doubleClicks: "ダブルクリック: ",
+                doubleClickPercentage: "ダブルクリックの割合: ",
+                lastDoubleClickDuration: "最後のダブルクリックの持続時間: ",
+                resetButton: "リセット"
+            },
+            sw: {
+                title: "Kigunduzi cha Shida Mbili",
+                description: "Bonyeza kitufe cha panya na uturuhusu kugundua ikiwa panya yako inaharibika. Kutetemeka hutokea wakati kitufe cha panya kilichovunjika kinapotuma mibofyo ya ziada isiyokusudiwa, na kusababisha mibofyo miwili wakati ulikusudia kubofya mara moja tu. Mibofyo miwili mingi? Inaweza kuwa wakati wa panya mpya!",
+                clicks: "Mibofyo: ",
+                doubleClicks: "Mibofyo Miwili: ",
+                doubleClickPercentage: "Asilimia ya Mibofyo Miwili: ",
+                lastDoubleClickDuration: "Muda wa Mibofyo Miwili ya Mwisho: ",
+                resetButton: "Weka Upya"
+            },
+            tr: {
+                title: "Çift Sorun Dedektörü",
+                description: "Fare düğmesine tıklayın ve farenizin arızalı olup olmadığını tespit etmemize izin verin. Kırık bir fare düğmesi istenmeyen ekstra tıklamalar gönderdiğinde, yalnızca bir kez tıklamak istediğinizde çift tıklamalar meydana gelir. Çok fazla çift tıklama mı? Yeni bir fare zamanı gelmiş olabilir!",
+                clicks: "Tıklamalar: ",
+                doubleClicks: "Çift Tıklamalar: ",
+                doubleClickPercentage: "Çift Tıklama Yüzdesi: ",
+                lastDoubleClickDuration: "Son Çift Tıklama Süresi: ",
+                resetButton: "Sıfırla"
+            },
+            ko: {
+                title: "더블 트러블 감지기",
+                description: "마우스 버튼을 클릭하고 마우스가 오작동하는지 감지하게 하세요. 고장난 마우스 버튼이 원치 않는 추가 클릭을 보내면 덜컹거림이 발생하여 한 번 클릭하려고 했을 때 더블 클릭이 발생합니다. 너무 많은 더블 클릭? 새 마우스를 사용할 때가 되었을 수 있습니다!",
+                clicks: "클릭: ",
+                doubleClicks: "더블 클릭: ",
+                doubleClickPercentage: "더블 클릭 비율: ",
+                lastDoubleClickDuration: "마지막 더블 클릭 지속 시간: ",
+                resetButton: "재설정"
+            },
+            it: {
+                title: "Rilevatore di Problemi Doppi",
+                description: "Fai clic sul pulsante del mouse e lasciaci rilevare se il tuo mouse non funziona correttamente. Il tintinnio si verifica quando un pulsante del mouse rotto invia clic aggiuntivi indesiderati, portando a doppi clic quando intendevi fare clic solo una volta. Troppi doppi clic? Potrebbe essere il momento di un nuovo mouse!",
+                clicks: "Clic: ",
+                doubleClicks: "Doppi Clic: ",
+                doubleClickPercentage: "Percentuale di Doppi Clic: ",
+                lastDoubleClickDuration: "Durata dell'Ultimo Doppio Clic: ",
+                resetButton: "Ripristina"
+            },
+            pl: {
+                title: "Wykrywacz Podwójnych Problemów",
+                description: "Kliknij przycisk myszy i pozwól nam wykryć, czy twoja mysz działa nieprawidłowo. Grzechotanie występuje, gdy uszkodzony przycisk myszy wysyła niezamierzone dodatkowe kliknięcia, co prowadzi do podwójnych kliknięć, gdy chciałeś kliknąć tylko raz. Zbyt wiele podwójnych kliknięć? Może nadszedł czas na nową mysz!",
+                clicks: "Kliknięcia: ",
+                doubleClicks: "Podwójne Kliknięcia: ",
+                doubleClickPercentage: "Procent Podwójnych Kliknięć: ",
+                lastDoubleClickDuration: "Czas Trwania Ostatniego Podwójnego Kliknięcia: ",
+                resetButton: "Zresetuj"
+            },
+            nl: {
+                title: "Dubbelprobleemdetector",
+                description: "Klik op de muisknop en laat ons detecteren of uw muis defect is. Rammelen treedt op wanneer een kapotte muisknop onbedoelde extra klikken verzendt, wat leidt tot dubbele klikken wanneer u slechts één keer wilde klikken. Te veel dubbele klikken? Het is misschien tijd voor een nieuwe muis!",
+                clicks: "Klikken: ",
+                doubleClicks: "Dubbele Klikken: ",
+                doubleClickPercentage: "Percentage Dubbele Klikken: ",
+                lastDoubleClickDuration: "Duur van de Laatste Dubbele Klik: ",
+                resetButton: "Reset"
+            },
+            fil: {
+                title: "Detektor ng Dobleng Problema",
+                description: "I-click ang pindutan ng iyong mouse at hayaan kaming tukuyin kung ang iyong mouse ay may sira. Ang rattling ay nangyayari kapag ang isang sirang pindutan ng mouse ay nagpapadala ng hindi sinasadyang dagdag na mga pag-click, na humahantong sa mga dobleng pag-click kapag nais mo lamang mag-click nang isang beses. Masyadong maraming dobleng pag-click? Maaaring oras na para sa isang bagong mouse!",
+                clicks: "Mga Pag-click: ",
+                doubleClicks: "Dobleng Pag-click: ",
+                doubleClickPercentage: "Porsyento ng Dobleng Pag-click: ",
+                lastDoubleClickDuration: "Huling Tagal ng Dobleng Pag-click: ",
+                resetButton: "I-reset"
+            },
+            vi: {
+                title: "Máy Dò Rắc Rối Kép",
+                description: "Nhấp vào nút chuột của bạn và để chúng tôi phát hiện xem chuột của bạn có bị trục trặc hay không. Tiếng lách cách xảy ra khi nút chuột bị hỏng gửi các lần nhấp bổ sung không mong muốn, dẫn đến nhấp đúp khi bạn chỉ muốn nhấp một lần. Quá nhiều lần nhấp đúp? Có thể đã đến lúc mua chuột mới!",
+                clicks: "Nhấp: ",
+                doubleClicks: "Nhấp Đúp: ",
+                doubleClickPercentage: "Tỷ Lệ Nhấp Đúp: ",
+                lastDoubleClickDuration: "Thời Gian Nhấp Đúp Cuối Cùng: ",
+                resetButton: "Đặt Lại"
+            }
+
+        };
+
+        function getUserLanguage() {
+            return navigator.language.split('-')[0];
+        }
+
+        function translatePage() {
+            const lang = getUserLanguage();
+            const translation = translations[lang] || translations['en'];
+
+            document.title = translation.title;
+            document.querySelector('h1').textContent = translation.title;
+            document.querySelector('.description').textContent = translation.description;
+            document.getElementById('clickCounter').textContent = `${translation.clicks}0`;
+            document.getElementById('doubleClickCounter').textContent = `${translation.doubleClicks}0`;
+            document.getElementById('doubleClickPercentage').textContent = `${translation.doubleClickPercentage}0%`;
+            document.getElementById('lastDoubleClickTime').textContent = `${translation.lastDoubleClickDuration}N/A`;
+            document.getElementById('resetButton').textContent = translation.resetButton;
+
+            // Apply large-text class to the fields
+            document.getElementById('clickCounter').classList.add('large-text');
+            document.getElementById('doubleClickCounter').classList.add('large-text');
+            document.getElementById('doubleClickPercentage').classList.add('large-text');
+            document.getElementById('lastDoubleClickTime').classList.add('large-text');
+        }
+
+        document.addEventListener('DOMContentLoaded', translatePage);
+        let clickCount = { left: 0, right: 0, middle: 0 };
+        let doubleClickCount = { left: 0, right: 0, middle: 0 };
+        let lastClickTime = { left: 0, right: 0, middle: 0 };
+        let lastDoubleClickDuration = "N/A";
+
+        document.body.addEventListener('mousedown', (event) => {
+            const now = Date.now();
+            let button;
+
+            switch (event.button) {
+                case 0:
+                    button = 'left';
+                    break;
+                case 1:
+                    button = 'middle';
+                    break;
+                case 2:
+                    button = 'right';
+                    break;
+                default:
+                    return;
+            }
+
+            clickCount[button]++;
+
+            if (now - lastClickTime[button] < 70) {
+                doubleClickCount[button]++;
+                lastDoubleClickDuration = now - lastClickTime[button] + ' ms';
+            }
+
+            lastClickTime[button] = now;
+            updateDisplay();
+        });
+
+        document.body.addEventListener('wheel', () => {
+            clickCount.middle++;
+            updateDisplay();
+        });
+
+        document.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+        });
+
+        document.getElementById('resetButton').addEventListener('click', () => {
+            clickCount = { left: 0, right: 0, middle: 0 };
+            doubleClickCount = { left: 0, right: 0, middle: 0 };
+            lastClickTime = { left: 0, right: 0, middle: 0 };
+            lastDoubleClickDuration = "N/A";
+            updateDisplay();
+        });
+
+        function updateDisplay() {
+            const totalClicks = clickCount.left + clickCount.right + clickCount.middle;
+            const totalDoubleClicks = doubleClickCount.left + doubleClickCount.right + doubleClickCount.middle;
+
+            document.getElementById('clickCounter').textContent = `${translations[getUserLanguage()]?.clicks || translations['en'].clicks}${totalClicks}`;
+            document.getElementById('doubleClickCounter').textContent = `${translations[getUserLanguage()]?.doubleClicks || translations['en'].doubleClicks}${totalDoubleClicks}`;
+            const lastDoubleClickTimeElement = document.getElementById('lastDoubleClickTime');
+            lastDoubleClickTimeElement.textContent = `${translations[getUserLanguage()]?.lastDoubleClickDuration || translations['en'].lastDoubleClickDuration}${lastDoubleClickDuration}`;
+
+            if (totalDoubleClicks > 0) {
+                lastDoubleClickTimeElement.style.display = 'block';
+            } else {
+                lastDoubleClickTimeElement.style.display = 'none';
+            }
+
+            const percentage = totalClicks > 0 ? (totalDoubleClicks / totalClicks) * 100 : 0;
+            const percentageElement = document.getElementById('doubleClickPercentage');
+            percentageElement.textContent = `${translations[getUserLanguage()]?.doubleClickPercentage || translations['en'].doubleClickPercentage}${percentage.toFixed(1)}%`;
+
+            if (percentage >= 5) {
+                percentageElement.style.backgroundColor = 'red';
+            } else if (percentage > 0) {
+                percentageElement.style.backgroundColor = 'orange';
+            } else {
+                percentageElement.style.backgroundColor = '#1e1e1e';
+            }
+        }
+    </script>
+</body>
+
+</html>
